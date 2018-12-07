@@ -1,0 +1,148 @@
+<extend name="Base::page"/>
+<block name="style">
+    <style>
+        .info_style{width: 30%;}
+        .logs_content{margin-left: 25px;}
+        .logs_line{line-height: 30px;}
+        table{border: 1px solid #000;width: 80%;}
+        th,td{border:  1px solid #000;text-align: center;line-height: 30px;padding: 0 5px;}
+    </style>
+</block>
+<block name="body">
+    <div class="wrapper">
+        <!--菜单-->
+        <include file="Base/menu" />
+
+        <!--内容页面-->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <!--<h1>-->
+                    <!---->
+                    <!--<small>Control panel</small>-->
+                <!--</h1>-->
+                <b>{$info['name']}</b>&nbsp;&nbsp;&nbsp;&nbsp;
+                负责人：{$info['person_id']}&nbsp;&nbsp;&nbsp;&nbsp;
+                下次跟进时间：{$info['next_follow_time']}&nbsp;&nbsp;&nbsp;&nbsp;
+
+                <a class="btn btn-primary btn-sm popshow" url="{:U('customer_transfer',array('customer_id'=>$info['id']))}" title="转移客户" w="600" h="400">转移</a>
+                <a class="btn btn-primary btn-sm popshow" url="{:U('edit',array('id'=>$info['id']))}" title="编辑客户" w="600" h="500">编辑</a>
+                <a class="btn btn-primary btn-sm popshow" url="{:U('add_follow',array('customer_id'=>$info['id']))}" title="写跟进" w="600" h="500">写跟进</a>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="row">
+
+                    <section class="col-lg-6 connectedSortable">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs pull-right">
+                                <li class="pull-left header">基本信息</li>
+                            </ul>
+                            <div class="tab-content no-padding">
+                                <div class="chart tab-pane active" style="position: relative; min-height: 600px;">
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label class="info_style">手机号</label>
+                                            <span>{$info['mobile']}</span>
+                                        </div>
+                                        <volist name="info['fields_data']" id="vo">
+                                            <div class="form-group">
+                                                <label class="info_style">{$vo['title']}</label>
+                                                <if condition="$vo['other_type'] eq 'image'">
+                                                    <span>
+                                                        <volist name="vo['content']" id="item">
+                                                            <img style="width: 100px;height: 100px;" src="{$item}" />
+                                                        </volist>
+                                                    </span>
+                                                    <else/>
+                                                    <span>{$vo['content']}</span>
+                                                </if>
+                                            </div>
+                                        </volist>
+                                        <notempty name="info['file_data']">
+                                        <div class="form-group">
+                                            <label class="info_style">附件</label>
+                                            <div>
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>上传时间</th>
+                                                            <th>附件名称</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <volist name="info['file_data']" id="vo">
+                                                        <tr>
+                                                            <td>{$vo['create_time']}</td>
+                                                            <td>{$vo['name']}</td>
+                                                            <td><a href="{$vo['url']}">下载</a></td>
+                                                        </tr>
+                                                    </volist>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        </notempty>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="col-lg-6 connectedSortable">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs pull-right">
+                                <li class="pull-left header">跟进动态</li>
+                            </ul>
+                            <div class="tab-content no-padding">
+                                <!-- Morris chart - Sales -->
+                                <div class="chart tab-pane active" style="position: relative; min-height: 600px;">
+                                    <div class="box-body">
+                                        <volist name="logs" id="vo">
+                                        <div class="form-group">
+                                            <label><i class="fa fa-fw fa-circle" style="margin-right: 5px;"></i>{$vo['create_time']}</label>
+                                            <div class="logs_content">
+                                                <switch name="vo['type']">
+                                                    <case value="1">
+                                                        <div class="logs_line">{$vo['content']['follow_user']}&nbsp;&nbsp;&nbsp;&nbsp;{$vo['content']['follow_type']}</div>
+                                                        <div class="logs_line">{$vo['content']['content']}</div>
+                                                        <notempty name="vo['content']['follow_pic']">
+                                                            <div class="logs_line">
+                                                                <volist name="vo['content']['follow_pic']" id="item">
+                                                                    <img style="width: 100px;height: 100px;" src="{:getFileUrl($item)}" />
+                                                                </volist>
+                                                            </div>
+                                                        </notempty>
+                                                        <div class="logs_line">写跟进的时间：{$vo['content']['follow_time']}</div>
+                                                    </case>
+                                                    <case value="2">
+                                                        <div class="logs_line">编辑客户</div>
+                                                        <volist name="vo['content']" id="item">
+                                                            <div class="logs_line">{$item['title']}&nbsp;&nbsp;&nbsp;&nbsp;{$item['content']}</div>
+                                                        </volist>
+                                                    </case>
+                                                    <default/><div class="logs_line">{$vo['content']}</div>
+                                                </switch>
+                                            </div>
+                                        </div>
+                                        </volist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!--尾部-->
+        <include file="Base/footer" />
+    </div>
+</block>
+
+<block name="script">
+</block>
